@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Button, Container, Form } from 'react-bootstrap'
+import { Button, Container, Form, Spinner } from 'react-bootstrap'
 import { AuthContext } from '../../context/AuthContextProvider';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,7 +33,7 @@ export default function Login() {
     async function login(){
         try {
             setLoading(true);
-            let res = await fetch(process.env.REACT_APP_URL_AUTH+'loginClient',{
+            let res = await fetch(process.env.REACT_APP_URL_AUTH+'login',{
                 headers : {'Content-Type' : 'application/json'},
                 method: 'POST',
                 body : JSON.stringify(user)
@@ -77,9 +77,10 @@ export default function Login() {
                         <Form.Control type='password' placeholder={'insert your password'} id='password' onChange={(el)=>handleForm(el.target)}/>
                     </Form.Group>
                     <Form.Group className='my-3'>
-                        <Button variant='dark' className='m-2' onClick={()=>{setRefresh(!refresh)}}>Reset</Button>
+                        <Button variant='dark' className='m-2' onClick={()=>{navigate('/register')}}>Registrati</Button>
                         <Button variant='success' className='m-2' onClick={login}>Login</Button>
                     </Form.Group>
+                    {loading && <Spinner animation='grow' variant='success' />}
                 </Form>
             </Container>
         </Container>
