@@ -1,17 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Col, Container, Row, Modal, Button, Form } from 'react-bootstrap'
+import { Col, Container, Row, Modal, Button, Form, Spinner } from 'react-bootstrap'
 import MyNav from '../../components/MyNav/MyNav'
 import { AuthContext } from '../../context/AuthContextProvider'
 
 export default function Profile() {
 
-    const { admin } = useContext(AuthContext);
+    const { admin, getProfile } = useContext(AuthContext);
 
-    const [refresh,setRefresh] = useState(false);
+    const [refresh, setRefresh] = useState(false);
 
-    useEffect(()=>{
+    const [loading, setLoading] = useState(false);
 
-    },[refresh])
+    useEffect(() => {
+        getProfile();
+    }, [refresh,admin])
 
     const [editProfile, setEditProfile] = useState({ ...admin });
     const [imageAvatar, setImageAvatar] = useState(new FormData());
@@ -64,28 +66,29 @@ export default function Profile() {
 
 
         try {
+            setLoading(true);
             // Rilevo il tipo di profilo da modificare
             let API = editProfile.barber ? process.env.REACT_APP_URL_BARBER : process.env.REACT_APP_URL_CLIENT;
-            console.log(imageAvatar.has('avatar'));
+
             if (imageAvatar.has('avatar')) {
                 imageAvatar.append('user', JSON.stringify(editProfile));
 
-                console.log(imageAvatar.get('avatar'));
-                console.log(imageAvatar.get('user'));
                 let res = await fetch(API + editProfile._id, {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                     method: 'PATCH',
                     body: imageAvatar
                 });
                 if (res.ok) {
-                    
+                    setLoading(false);
                     let json = await res.json();
-                    console.log(json);
+                    setShowEditBar(false);
                     setRefresh(true);
-                    
+
                 } else {
+                    setLoading(false);
                     console.log('errore col caricamento dell immagine');
-                    
+                    setShowEditBar(false);
+                    setRefresh(true);
                 }
             } else {
                 let res = await fetch(API + editProfile._id, {
@@ -95,17 +98,22 @@ export default function Profile() {
                 });
                 console.log('Senza immagine');
                 if (res.ok) {
+                    setLoading(false);
                     let json = await res.json();
-                    console.log(json);
+                    setShowEditBar(false);
                     setRefresh(true);
                 } else {
-                    console.log('errore col caricamento delle modifiche');
+                    setLoading(false);
+                    setShowEditBar(false);
+                    setRefresh(true);
                 }
             }
 
-            
+
         } catch (error) {
-            console.log('Errore Nella chiamata all API');
+            setLoading(false);
+            setShowEditBar(false);
+            setRefresh(true);
         }
 
     }
@@ -127,7 +135,7 @@ export default function Profile() {
                                 {admin.barber && <span className='warning d-block'>*Account Professional</span>}
                                 <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
                                 <span className='px-2'>{admin.email}</span>
-                                <Button className='nav-link btn-outline-light success px-2' onClick={() => {  setShowEditBar(true) }}>modifica profilo</Button>
+                                <Button className='nav-link btn-outline-light success px-2' onClick={() => { setShowEditBar(true) }}>modifica profilo</Button>
                             </Container>
 
                             {admin.barber && admin.services.map((el) => {
@@ -204,7 +212,7 @@ export default function Profile() {
                             <Form.Control type='text' defaultValue={admin.address?.countryCode} placeholder='Provincia Code' id='countryCode' className='my-2' onChange={(el) => handleForm(el.target)} />
                         </Form.Group>
                         <Form.Group>
-                            <Form.Control type='file' id='avatar' onChange={(e)=>handleImage(e.target.files[0])} />
+                            <Form.Control type='file' id='avatar' onChange={(e) => handleImage(e.target.files[0])} />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -215,6 +223,9 @@ export default function Profile() {
                     <Button className="bg-success" onClick={updateProfile}>
                         Modifica
                     </Button>
+                    {loading && <Container className='row'>
+                        <span>Caricamento in corso...  <Spinner animation="grow" variant="success" /></span>
+                    </Container>}
                 </Modal.Footer>
             </Modal>
         </>

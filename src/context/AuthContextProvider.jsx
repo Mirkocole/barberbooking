@@ -31,7 +31,8 @@ export default function AuthContextProvider({children}) {
 
     const value = {
         admin,
-        setAdmin
+        setAdmin,
+        getProfile
     }
 
   return (
