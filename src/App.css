@@ -36,3 +36,62 @@
     transform: rotate(360deg);
   }
 }
+
+/* Override style bootstrap */
+
+button{
+  border: none!important;
+}
+
+.primary{
+  color: #284666!important;
+}
+
+.success{
+  color: #1a8999!important;
+}
+
+.warning{
+  color:#ed0d05!important;
+}
+
+.info{
+  color: #8b2432!important;
+}
+
+
+.bg-info{
+  background-color: #8b2432!important;
+}
+
+.bg-primary{
+  background-color: #284666!important;
+}
+
+.bg-success{
+  background-color: #1a8999!important;
+}
+
+.bg-warning{
+  background-color:#ed0d05!important;
+}
+
+
+/* Custom style */
+
+.herohome{
+  height: 600px;
+  color:white;
+  background-blend-mode: darken;
+  background-color: rgba(0, 0, 0, 0.456);
+  background-image: url('./assets/bg-barberbooking.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.herohome h1{
+  font-size: 80px;
+  font-weight: bolder;
+}

@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Button, Container, Form, Spinner } from 'react-bootstrap'
+import { Button, Container, Form, Spinner, Row, Col } from 'react-bootstrap'
 import { AuthContext } from '../../context/AuthContextProvider';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+
 
 
     const [loading,setLoading] = useState(false);
@@ -15,13 +16,15 @@ export default function Login() {
         password : ''
     });
 
-    const [refresh,setRefresh] = useState(false);
+   
     const [logged,setLogged] = useState(false);
 
     // Refresh pagina
     useEffect(()=>{
-        
-    },[refresh])
+        if (admin._id) {
+            navigate('/');
+        }
+    },[admin])
 
     const handleForm = (el)=>{
         let id = el.id;
@@ -61,8 +64,10 @@ export default function Login() {
     <>
         <Container fluid className='p-5'>
 
-            <Container className='w-50'>
-                <Form className='p-5 m-3 rounded shadow'>
+            
+                
+                    <Col xs={12} md={8} lg={6} xl={5} xxl={4} className='mx-auto'>
+                    <Form className='p-5 m-3 rounded shadow'>
                     <h3>Login</h3>
                     <Form.Group>
                         <Form.Label>
@@ -77,12 +82,14 @@ export default function Login() {
                         <Form.Control type='password' placeholder={'insert your password'} id='password' onChange={(el)=>handleForm(el.target)}/>
                     </Form.Group>
                     <Form.Group className='my-3'>
-                        <Button variant='dark' className='m-2' onClick={()=>{navigate('/register')}}>Registrati</Button>
-                        <Button variant='success' className='m-2' onClick={login}>Login</Button>
+                        <Button  className='m-2 bg-dark' onClick={()=>{navigate('/register')}}>Registrati</Button>
+                        <Button  className='m-2 bg-success' onClick={login}>Login</Button>
                     </Form.Group>
                     {loading && <Spinner animation='grow' variant='success' />}
                 </Form>
-            </Container>
+                    </Col>
+                
+            
         </Container>
     </>
   )

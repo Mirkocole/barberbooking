@@ -221,7 +221,7 @@ export default function Register() {
             {/* Modale Registrazione Parrucchiere */}
             <Modal show={modalBar} onHide={handleCloseBar}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Registrazione Cliente</Modal.Title>
+                    <Modal.Title>Registrazione Parrucchiere</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form noValidate validated={validatedbar} onSubmit={handleSubmitBar}>
@@ -258,7 +258,7 @@ export default function Register() {
                             <Button variant="secondary" onClick={handleCloseBar} className='mx-2'>
                                 Annulla
                             </Button>
-                            <Button variant="success" type="submit">Ragistrati</Button>
+                            <Button variant="dark" type="submit">Ragistrati</Button>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
