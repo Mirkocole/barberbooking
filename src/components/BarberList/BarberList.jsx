@@ -47,10 +47,14 @@ export default function BarberList() {
                     <Row xs={1} md={3} className='g-2'>
                         {barberlist && barberlist.map((el, index) => {
                             return <Col key={index}>
-                                <Container className='p-4 shadow rounded'>
+                                <Container className='p-4 shadow rounded d-flex'>
+                                    <img alt='' src={el.avatar} style={{maxWidth : '180px'}} className='rounded-circle border'/>
+                                    <Col className='d-flex flex-column'>
 
-                                    <span className='px-2'>{el.name} {el.lastname}</span>
+                                    <span className='px-2 fs-5 info'><b>{el.salon}</b></span>
+                                    <span className='px-2'><b>{el.name} {el.lastname}</b></span>
                                     <span className='px-2'>{el.email}</span>
+                                    </Col>
                                 </Container>
                             </Col>
                         })}
