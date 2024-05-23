@@ -200,13 +200,13 @@ export default function Profile() {
                     <Row xs={1} md={2} className='g-2 justify-content-center'>
                         {admin.barber && <Col xs={12} md={4}>
                             <Container className='p-4 border'>
-                                <h3 className='info'>Salone: {admin.salon}</h3>
-                                <img alt='immagine profilo' src={admin.cover ?? ''} style={{ maxWidth: '180px' }} />
+                                <h3 >Salone: <br></br> <b className='info'>{admin.salon}</b></h3>
+                                <img alt='immagine profilo' src={admin.cover ?? ''} style={{ width: '180px', height: '180px' }} />
                             </Container>
                         </Col>}
                         <Col>
                             <Container className='p-4 border rounded'>
-                                <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ maxWidth: '180px' }} className='rounded-circle'/>
+                                <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit : 'cover' }} className='rounded-circle'/>
                                 {admin.barber && <span className='warning d-block'>*Account Professional</span>}
                                 <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
                                 <span className='px-2'>{admin.email}</span>
@@ -224,10 +224,10 @@ export default function Profile() {
                             </Container>
 
                             {admin.barber && admin.services.map((el) => {
-                                return <Container key={el.name} className='p-4 border rounded'>
+                                return <Container key={el.name} className='p-4 border rounded my-1'>
                                     <h3>{el.name}</h3>
                                     <span>{el.description}</span><br></br>
-                                    <span><b>{el.price}€</b></span>
+                                    <span><b>{el.price}€</b></span><br></br>
                                     <Button className='bg-danger' onClick={()=>deleteService(el._id)}>Elimina</Button>
                                 </Container>
                             })}
