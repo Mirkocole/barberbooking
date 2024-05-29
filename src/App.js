@@ -27,7 +27,7 @@ function App() {
 
               <Route path='/' element={<Homepage />} />
               <Route path='/profile' element={<Profile />} />
-              <Route path='/prenotazioni' element={<Profile />} />
+              <Route path='/prenotazioni' element={<Booking />} />
               <Route path='/calendar/:id' element={<Calendar />} />
             </Route>
 

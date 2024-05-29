@@ -95,3 +95,11 @@ button{
   font-size: 80px;
   font-weight: bolder;
 }
+
+.cardbarber:hover{
+  cursor: pointer;
+}
+
+.link{
+  cursor: pointer;
+}

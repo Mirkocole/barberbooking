@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { Container, Form, Button, Spinner, Card, Row, Col, Modal, InputGroup } from 'react-bootstrap'
 import Clireg from '../../assets/cli-reg.png'
 import Barbereg from '../../assets/barber-reg.png'
+import { AuthContext } from '../../context/AuthContextProvider'
+import { useNavigate } from 'react-router-dom'
 
 export default function Register() {
 
 
+    const navigate = useNavigate();
+    const {admin,setAdmin} = useContext(AuthContext);
     const [validated, setValidated] = useState(false);
     const [validatedbar, setValidatedbar] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -58,7 +62,7 @@ export default function Register() {
             if (res.ok) {
                 setLoading(false);
                 let json = await res.json();
-                console.log(json);
+                login({email: cliente.email, password: cliente.password});
 
             } else {
                 setLoading(false);
@@ -88,6 +92,7 @@ export default function Register() {
                 setLoading(false);
                 let json = await res.json();
                 console.log(json);
+                login({email: barber.email, password: barber.password});
 
             } else {
                 setLoading(false);
@@ -101,6 +106,32 @@ export default function Register() {
         }
     }
 
+    async function login(user){
+        try {
+            setLoading(true);
+            console.log(user)
+            let res = await fetch(process.env.REACT_APP_URL_AUTH+'login',{
+                headers : {'Content-Type' : 'application/json'},
+                method: 'POST',
+                body : JSON.stringify(user)
+            });
+            if (res.ok) {
+                setLoading(false);
+                let json = await res.json();
+                console.log(json);
+
+                setAdmin(json.user);
+                localStorage.setItem('token',json.token);
+                navigate('/');
+            }else{
+                setLoading(false);
+            }
+
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    }
 
 
 
@@ -129,6 +160,12 @@ export default function Register() {
         createBarber();
     };
 
+
+    useEffect(()=>{
+        if (admin._id) {
+            navigate('/');
+        }
+    },[admin])
 
     return (
         <>
@@ -173,7 +210,7 @@ export default function Register() {
                     <Modal.Title>Registrazione Cliente</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form noValidate validated={validated} onSubmit={handleSubmitCli}>
+                    <Form noValidate validated={validated}>
                         <Form.Group>
                             <Form.Label>Nome</Form.Label>
                             <Form.Control type='text' required placeholder='insert name' id='name' className='inline-block' onChange={(el) => { handleFormClient(el.target) }} />
@@ -207,7 +244,7 @@ export default function Register() {
                             <Button variant="secondary" onClick={handleCloseCli} className='mx-2'>
                                 Annulla
                             </Button>
-                            <Button variant="success" type="submit">Ragistrati</Button>
+                            <Button variant="success" onClick={handleSubmitCli}>Ragistrati</Button>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -224,7 +261,7 @@ export default function Register() {
                     <Modal.Title>Registrazione Parrucchiere</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form noValidate validated={validatedbar} onSubmit={handleSubmitBar}>
+                    <Form noValidate validated={validatedbar} >
                         <Form.Group>
                             <Form.Label>Nome</Form.Label>
                             <Form.Control type='text' required placeholder='insert name' id='name' className='inline-block' onChange={(el) => { handleFormBarber(el.target) }} />
@@ -258,7 +295,7 @@ export default function Register() {
                             <Button variant="secondary" onClick={handleCloseBar} className='mx-2'>
                                 Annulla
                             </Button>
-                            <Button variant="dark" type="submit">Ragistrati</Button>
+                            <Button variant="dark" onClick={handleSubmitBar}>Ragistrati</Button>
                         </Form.Group>
                     </Form>
                 </Modal.Body>

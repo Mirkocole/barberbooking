@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { QronoCalendar } from 'booking_calendar'
 import MyNav from '../../components/MyNav/MyNav';
-import { Container, Modal, Form, Button } from 'react-bootstrap';
+import { Container, Modal, Form, Button, Spinner,Col } from 'react-bootstrap';
 import { useState } from 'react';
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
@@ -19,67 +19,92 @@ const localizer = luxonLocalizer(DateTime, { firstDayOfWeek: 1 });
 export default function MyCalendar() {
 
     const params = useParams();
+    const views = Views;
+    const [customViews, setCustomViews] = useState([views.MONTH, views.WEEK, views.DAY, views.AGENDA]);
 
     // variabili per il modale dei client
     const [modalClient, setModalClient] = useState(false);
     const hideModalClient = () => setModalClient(false);
     const showModalClient = () => setModalClient(true);
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const { admin } = useContext(AuthContext);
 
     const [barber, setBarber] = useState({});
 
-    const [newBooking,setNewBooking] = useState({
+    const [newBooking, setNewBooking] = useState({
         client: admin._id
     });
 
 
     const handleForm = (el) => {
-        setNewBooking((prev)=>{
-            prev = {...prev,services : [{nome: el.options[el.selectedIndex].text}]}
+        let idService = el.options[el.selectedIndex].value;
+        let servi = barber.services.filter((se) => se._id == idService);
+        
+        let end = new Date(new Date(newBooking.start).getTime() + servi[0].duration * 60000);
+        console.log(end)
+        setNewBooking((prev) => {
+            prev = { ...prev, services: [{ ...servi[0] }],end : end }
             return prev
         })
-        console.log(el.options[el.selectedIndex].text);
+        console.log(newBooking)
     }
 
     const handleSelect = (e) => {
-        setNewBooking((prev)=>{
-            prev = {...prev,data : e.start}
-            return prev
-        })
-        showModalClient();
-        // let newBook = { start: e.start, end: e.end, title: 'Nuova prenotazione' };
-        // console.log(e);
-        // setBookings([...bookings, newBook]);
+        
+        if (admin.barber) {
+            alert('Sei il Parruchiere');
+        } else {
+            
+            if (e.start < new Date()) {
+                alert('Devi selezionare un orario presente o futuro!')
+            } else {
+    
+                setNewBooking((prev) => {
+                    prev = { ...prev, start: e.start }
+                    return prev
+                })
+                showModalClient();
+    
+            }
+        }
 
     };
 
     async function createBooking() {
         try {
 
-            setNewBooking((prev)=>{
-                prev = {...prev,barber : barber._id}
-                return prev
-            })
             
-            console.log(newBooking);
-            console.log(barber)
+            setLoading(true);
             
-            let res = await fetch(process.env.REACT_APP_URL_BOOKING,{
-                headers: {'Content-Type': 'application/json', 'Authorization' : 'Bearer '+localStorage.getItem('token')},
-                method : 'POST',
+
+
+
+            let res = await fetch(process.env.REACT_APP_URL_BOOKING, {
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                method: 'POST',
                 body: JSON.stringify(newBooking)
             });
 
             if (res.ok) {
+                setLoading(false);
                 let json = await res.json();
-                let obg = {start:newBooking.data, end:newBooking.data, title: `${admin.name} ${admin.lastname} ${newBooking.services[0].nome}`}
-                setBookings([...bookings,obg]);
+                let obg = { start: newBooking.data, end: newBooking.data, title: `${admin.name} ${admin.lastname} ${newBooking.services[0].nome}` }
+                setBookings([...bookings, obg]);
+                hideModalClient();
             } else {
-                console.log('Inserimento prenotazione non eseguita')
+                setLoading(false);
+                console.log('Inserimento prenotazione non eseguita');
+                setErrorMessage("C'è stato un errore nella prenotazione,riprova");
+                setTimeout(() => {
+                    setErrorMessage("");
+                }, 3000)
             }
         } catch (error) {
+            setLoading(false);
             console.log(error);
+            hideModalClient();
         }
     }
 
@@ -95,6 +120,7 @@ export default function MyCalendar() {
             today: 'Oggi',
             agenda: 'Agenda',
 
+            noEventsInRange: 'Non ci sono prenotazioni in questo range.',
             showMore: (total) => `+${total} más`,
         }
     }
@@ -104,19 +130,42 @@ export default function MyCalendar() {
 
     useEffect(() => {
 
-        
+
         if (!admin.barber && params.id) {
-            
+
+            setCustomViews([views.DAY]);
             getBarber(params.id);
+
         } else {
             setBarber(admin);
+            let listBookings = [];
+            for (const boo of admin.bookings) {
+                listBookings.push({ start: new Date(boo.start), end: new Date(boo.end), title: `${boo.client.name} ${boo.client.lastname}` })
+            }
+            setBookings([...listBookings]);
+            console.log(bookings)
+            
         }
 
     }, [])
 
 
     useEffect(() => {
+        if (!admin.barber && params.id) {
 
+            setCustomViews([views.DAY]);
+            getBarber(params.id);
+
+        } else {
+            setBarber(admin);
+            let listBookings = [];
+            for (const boo of admin.bookings) {
+                listBookings.push({ start: new Date(boo.start), end: new Date(boo.end), title: `${boo.client.name} ${boo.client.lastname}` })
+            }
+            setBookings([...listBookings]);
+            console.log(bookings)
+            
+        }
     }, [bookings])
 
 
@@ -130,6 +179,18 @@ export default function MyCalendar() {
             if (res.ok) {
                 let json = await res.json();
                 setBarber(json);
+                setNewBooking((prev) => {
+                    prev = { ...prev, barber: json._id }
+                    return prev
+                });
+                
+                let listBookings = [];
+                for (const boo of json.bookings) {
+                    listBookings.push({ start: new Date(boo.start), end: new Date(boo.end), title: `${boo.client.name} ${boo.client.lastname}` })
+                }
+                setBookings([...listBookings]);
+                
+
             } else {
                 console.log('errore di ricezione dati')
             }
@@ -137,6 +198,7 @@ export default function MyCalendar() {
             console.log(error);
         }
     }
+
 
     return (
         <>
@@ -146,16 +208,22 @@ export default function MyCalendar() {
 
 
 
-                <Container>
-                    <h3>Barber</h3>
+                <Container className='row m-3 p-0 d-flex flex-row align-items-center p-2 shadow rounded'>
+                    <Col xs={12} md={2}>
+                    <img alt='' src={barber.avatar} style={{width: '100px', height: '100px', objectFit:'cover'}} className='rounded-circle d-inline-block '/>
+                    </Col>
+                    <Col>
+                    <h3 className='info'>{barber.salon}</h3>
+                    <p className='info'>{barber.name} {barber.lastname}</p>
+                    </Col>
                 </Container>
-                <Container>
+                <Container className='mb-3'>
 
                     <Calendar
                         onSelectEvent={(e) => {
                             alert(e.title);
                         }}
-                        onSelecting={() => alert(312321)}
+                        onSelecting={() => { }}
                         localizer={localizer}
                         events={bookings}
                         startAccessor="start"
@@ -163,11 +231,13 @@ export default function MyCalendar() {
                         style={{ height: '85vh', width: '100%' }}
                         onSelectSlot={handleSelect}
                         selectable={true}
-                        max={new Date(2024, 0, 1, 20, 0, 0)}
-                        min={new Date(2024, 0, 1, 7, 0, 0)}
+                        max={new Date(0, 0, 1, 20, 0, 0)}
+                        min={new Date(0, 0, 1, 7, 0, 0)}
                         culture='it-IT'
                         messages={lang.it}
-                        defaultView={Views.WEEK}
+                        defaultView={views.DAY}
+                        views={[...customViews]}
+
                         step={30}
                     />
 
@@ -187,10 +257,11 @@ export default function MyCalendar() {
                     <Form>
                         <Form.Group>
 
-                            <Form.Label>Seleziona il servizio</Form.Label>
+
                             <Form.Select aria-label="Default select example" onChange={(el) => handleForm(el.target)}>
+                                <option> Seleziona il servizio</option>
                                 {barber.services && barber.services.map((el, index) => {
-                                    return <option key={index} value={el.name}>{el.name}</option>
+                                    return <option key={index} value={el._id}>{el.name} {el.price}€</option>
                                 })}
                             </Form.Select>
                         </Form.Group>
@@ -202,7 +273,8 @@ export default function MyCalendar() {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-
+                    {loading && <Spinner animation="grow" variant="danger" />}
+                    {errorMessage !== '' && <p className='info'>{errorMessage}</p>}
                 </Modal.Footer>
             </Modal>
         </>

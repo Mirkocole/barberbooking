@@ -11,31 +11,37 @@ export default function Profile() {
 
     const [loading, setLoading] = useState(false);
 
-    const [service,setService] = useState({});
+    const [service, setService] = useState({});
 
-    const [modalService,setModalService] = useState(false);
+    const [modalService, setModalService] = useState(false);
 
-    const handleModalService = ()=>{
+    const handleModalService = () => {
         setModalService((prev) => !prev);
     }
 
-    const handleService = (el)=>{
+    const [modalEditService,setModalEditService] = useState(false);
+    const handleModalEditService = (el)=> {
+        setService(el);
+        setModalEditService(!modalEditService)};
+
+    const handleService = (el) => {
         let key = el.id;
         let value = key == 'price' ? parseInt(el.value) : el.value;
 
-        setService((prev)=>{
-            prev = {...prev,[key] : value};
+        setService((prev) => {
+            prev = { ...prev, [key]: value };
             return prev
         })
     }
 
-    
+
 
     const [editProfile, setEditProfile] = useState({ ...admin });
     const [imageAvatar, setImageAvatar] = useState(new FormData());
     const handleImage = (img) => {
 
         setImageAvatar((prev) => {
+            prev.delete('user');
             prev.delete('avatar');
             prev.append('avatar', img);
             return prev;
@@ -46,6 +52,7 @@ export default function Profile() {
     const [showEditCli, setShowEditCli] = useState(false);
 
     const [showEditBar, setShowEditBar] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
 
     const handleForm = (el) => {
         let key = el.id;
@@ -75,13 +82,13 @@ export default function Profile() {
     }
 
 
-    async function addService(){
-        
+    async function addService() {
+
         try {
             setLoading(true);
-            let res = await fetch(process.env.REACT_APP_URL_BARBER+editProfile._id+'/services',{
-                headers:{'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+localStorage.getItem('token')},
-                method:'POST',
+            let res = await fetch(process.env.REACT_APP_URL_BARBER + editProfile._id + '/services', {
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                method: 'POST',
                 body: JSON.stringify(service)
             });
 
@@ -101,16 +108,16 @@ export default function Profile() {
             console.log(error);
             handleModalService();
         }
-        
+
     }
 
-    async function deleteService(id){
+    async function deleteService(id) {
         try {
             setLoading(true);
-            console.log(process.env.REACT_APP_URL_BARBER+editProfile._id+'/services/'+id)
-            let res = await fetch(process.env.REACT_APP_URL_BARBER+editProfile._id+'/services/'+id,{
-                headers:{'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+localStorage.getItem('token')},
-                method: 'PUT'
+            console.log(process.env.REACT_APP_URL_BARBER + editProfile._id + '/services/' + id)
+            let res = await fetch(process.env.REACT_APP_URL_BARBER + editProfile._id + '/services/' + id, {
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                method: 'DELETE'
             });
 
             if (res.ok) {
@@ -119,6 +126,29 @@ export default function Profile() {
             } else {
                 setLoading(false);
                 console.log('Errore nella cancellazione del servizio');
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function updateService(id){
+        try {
+            setLoading(true);
+            console.log(process.env.REACT_APP_URL_BARBER + editProfile._id + '/services/' + id)
+            let res = await fetch(process.env.REACT_APP_URL_BARBER + editProfile._id + '/services/' + id, {
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                method: 'PUT',
+                body: JSON.stringify(service)
+            });
+
+            if (res.ok) {
+                setLoading(false);
+                setRefresh(!refresh);
+                setModalEditService(false);
+            } else {
+                setLoading(false);
+                console.log('Errore nella modifica del servizio');
             }
         } catch (error) {
             console.log(error)
@@ -136,6 +166,7 @@ export default function Profile() {
             let API = editProfile.barber ? process.env.REACT_APP_URL_BARBER : process.env.REACT_APP_URL_CLIENT;
 
             if (imageAvatar.has('avatar')) {
+
                 imageAvatar.append('user', JSON.stringify(editProfile));
 
                 let res = await fetch(API + editProfile._id, {
@@ -144,30 +175,52 @@ export default function Profile() {
                     body: imageAvatar
                 });
                 if (res.ok) {
-                    setLoading(false);
-                    let json = await res.json();
-                    setShowEditBar(false);
-                    setRefresh(true);
-
+                    console.log('immagine caricata');
+                    
+                    let response = await res.json();
+                    console.log(response);
+                    if (response) {
+                        let res2 = await fetch(API + response._id, {
+                            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json' },
+                            method: 'PUT',
+                            body: JSON.stringify({...editProfile,avatar: response.avatar})
+                        });
+    
+                        if (res2.ok) {
+                            setLoading(false);
+                            let json = await res2.json();
+                            setShowEditBar(false);
+                            getProfile();
+                            setRefresh(true);
+                        } else {
+                            setLoading(false);
+                            setShowEditBar(false);
+                            setRefresh(true);
+                        }
+                    }else{
+                        console.log('response non è ok')
+                    }
+                    imageAvatar.delete('avatar');
                 } else {
+                    imageAvatar.delete('avatar');
                     setLoading(false);
                     console.log('errore col caricamento dell immagine');
                     setShowEditBar(false);
                     setRefresh(true);
                 }
             } else {
+
                 let res = await fetch(API + editProfile._id, {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json' },
                     method: 'PUT',
                     body: JSON.stringify(editProfile)
                 });
-                
+
                 if (res.ok) {
                     setLoading(false);
                     let json = await res.json();
-                    console.log('Res');
-                    console.log(json);
                     setShowEditBar(false);
+                    getProfile();
                     setRefresh(true);
                 } else {
                     setLoading(false);
@@ -206,7 +259,7 @@ export default function Profile() {
                         </Col>}
                         <Col>
                             <Container className='p-4 border rounded'>
-                                <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit : 'cover' }} className='rounded-circle'/>
+                                <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit: 'cover' }} className='rounded-circle' />
                                 {admin.barber && <span className='warning d-block'>*Account Professional</span>}
                                 <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
                                 <span className='px-2'>{admin.email}</span>
@@ -216,19 +269,25 @@ export default function Profile() {
                                 <span className='px-2'>{admin.address?.city}</span>
                                 <span className='px-2'>{admin.address?.postalCode}</span>
                                 <span className='px-2'>{admin.address?.country}</span>
-                                <Button className='nav-link btn-outline-light success px-2 mt-3' onClick={() => { setShowEditBar(true) }}>modifica profilo</Button>
+                                <Row>
+
+                                    <span className='nav-link btn-outline-light success px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>modifica profilo</span>
+                                    <span className='nav-link btn-outline-light info px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>elimina profilo</span>
+                                </Row>
                             </Container>
 
-                            <Container className='my-3'>
+                            {admin.barber && <Container className='my-3'>
                                 <Button className='bg-primary' onClick={handleModalService}>Aggiungi Servizio +</Button>
-                            </Container>
+                            </Container>}
 
                             {admin.barber && admin.services.map((el) => {
                                 return <Container key={el.name} className='p-4 border rounded my-1'>
                                     <h3>{el.name}</h3>
                                     <span>{el.description}</span><br></br>
+                                    <span>Durata: <b>{el.duration} min</b></span><br></br>
                                     <span><b>{el.price}€</b></span><br></br>
-                                    <Button className='bg-danger' onClick={()=>deleteService(el._id)}>Elimina</Button>
+                                    <span className='link info me-3' onClick={() => deleteService(el._id)}>Elimina</span>
+                                    <span className='link primary' onClick={()=> handleModalEditService(el)}>Modifica</span>
                                 </Container>
                             })}
                         </Col>
@@ -236,14 +295,14 @@ export default function Profile() {
                 </Container>
             </Container>
 
-            
+
 
 
 
             {/* Modal add service */}
             <Modal show={modalService} onHide={handleModalService}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Modifica Profilo</Modal.Title>
+                    <Modal.Title>Aggiungi Servizio</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -251,6 +310,7 @@ export default function Profile() {
                             <Form.Control type='text' placeholder='Nome' id='name' className='my-2' onChange={(el) => handleService(el.target)} />
                             <Form.Control type='text' placeholder='Descrizione' id='description' className='my-2' onChange={(el) => handleService(el.target)} />
                             <Form.Control type='number' min={0} placeholder='Prezzo' id='price' className='my-2' onChange={(el) => handleService(el.target)} />
+                            <Form.Control type='number' min={0} placeholder='Duration' id='duration' className='my-2' onChange={(el) => handleService(el.target)} />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -260,6 +320,44 @@ export default function Profile() {
                     </Button>
                     <Button variant="primary" onClick={addService}>
                         Aggiungi
+                    </Button>
+                    {loading && <Container className='row'>
+                        <span>Caricamento in corso...  <Spinner animation="grow" variant="success" /></span>
+                    </Container>}
+                </Modal.Footer>
+            </Modal>
+
+            {/* Modal edit service */}
+            <Modal show={modalEditService} onHide={handleModalEditService}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Modifica Servizio</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Label>Nome</Form.Label>
+                            <Form.Control type='text' placeholder='Nome' id='name' className='my-2' defaultValue={service.name} onChange={(el) => handleService(el.target)} />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control type='text' placeholder='Descrizione' id='description' className='my-2' defaultValue={service.description} onChange={(el) => handleService(el.target)} />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Price</Form.Label>
+                            <Form.Control type='number' min={0} placeholder='Prezzo' id='price' className='my-2' defaultValue={service.price} onChange={(el) => handleService(el.target)} />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Durata</Form.Label>
+                            <Form.Control type='number' min={0} placeholder='Durata' id='duration' className='my-2' defaultValue={service?.duration} onChange={(el) => handleService(el.target)} />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleModalEditService}>
+                        Annulla
+                    </Button>
+                    <Button variant="primary" onClick={()=>updateService(service._id)}>
+                        Modifica
                     </Button>
                     {loading && <Container className='row'>
                         <span>Caricamento in corso...  <Spinner animation="grow" variant="success" /></span>
@@ -307,6 +405,21 @@ export default function Profile() {
                     </Container>}
                 </Modal.Footer>
             </Modal>
+
+
+            {/* Modal Delete Account */}
+            {/* <Modal show={showDelete} onHide={setShowDelete(false)}>
+                <Modal.Header>
+                    <h4>Elimina Account</h4>
+                </Modal.Header>
+                <Modal.Body>
+                    <h5>Sei sicuro di voler eliminare il tuo account?</h5>
+                    <div className='row'>
+                        <span className='nav-link link dark'>Annulla</span>
+                        <Button className='nav-link '>Elimina</Button>
+                    </div>
+                </Modal.Body>
+            </Modal> */}
         </>
     )
 }
