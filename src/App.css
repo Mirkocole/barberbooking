@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: 'Roboto';
 }
 
 .App-logo {
@@ -12,6 +13,12 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
+
+h1,h2,h3,h4{
+  font-family: 'Lobster';
+}
+
 
 .App-header {
   background-color: #282c34;
@@ -32,6 +39,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -39,67 +47,120 @@
 
 /* Override style bootstrap */
 
-button{
-  border: none!important;
+button {
+  border: none !important;
 }
 
-.primary{
-  color: #284666!important;
+.primary {
+  color: #412A1D !important;
 }
 
-.success{
-  color: #1a8999!important;
+.success {
+  color: #8D6749 !important;
 }
 
-.warning{
-  color:#ed0d05!important;
+.warning {
+  color: #4F2E1A !important;
 }
 
-.info{
-  color: #8b2432!important;
+.info {
+  color: #CFCAC4 !important;
+}
+
+.dark {
+  color: #1F1D1B !important;
 }
 
 
-.bg-info{
-  background-color: #8b2432!important;
+.bg-gradient-primary {
+  background: rgb(141,103,73);
+background: linear-gradient(156deg, rgba(141,103,73,1) 0%, rgba(65,42,29,1) 100%);
+}
+.bg-gradient-secondary {
+  background: rgb(31,29,27);
+background: linear-gradient(349deg, rgba(31,29,27,1) 0%, rgba(82,56,41,1) 100%);
 }
 
-.bg-primary{
-  background-color: #284666!important;
+.bg-info {
+  background-color: #CFCAC4 !important;
 }
 
-.bg-success{
-  background-color: #1a8999!important;
+.bg-primary {
+  background-color: #412A1D !important;
 }
 
-.bg-warning{
-  background-color:#ed0d05!important;
+.bg-success {
+  background-color: #8D6749 !important;
+}
+
+.bg-warning {
+  background-color: #4F2E1A !important;
 }
 
 
 /* Custom style */
 
-.herohome{
+.herohome {
   height: 600px;
-  color:white;
+  color: white;
   background-blend-mode: darken;
   background-color: rgba(0, 0, 0, 0.456);
-  background-image: url('./assets/bg-barberbooking.png');
+  background-image: url('./assets/barberBG2.jpeg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
 }
 
-.herohome h1{
+.herobarber {
+  height: 300px;
+  color: white;
+  background-blend-mode: darken;
+  background-color: rgba(0, 0, 0, 0.456);
+  background-image: url('./assets/barberBG.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+
+}
+
+.herohome h1 {
   font-size: 80px;
   font-weight: bolder;
 }
 
-.cardbarber:hover{
+
+.heroRegister{
+  min-height: 100vh;
+  background-image: url(../src/assets/bg-register.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: darken;
+  background-color: rgba(0, 0, 0, 0.433);
+}
+
+.cardbarber:hover {
   cursor: pointer;
 }
 
-.link{
+.link {
   cursor: pointer;
+}
+
+.callToAction{
+  cursor: pointer;
+  background-color: rgb(255, 255, 255);
+  color: #8D6749;
+  border: none!important;
+  transition: all .5s;
+}
+
+.callToAction:hover{
+  cursor: pointer;
+  background-color: #8D6749;
+  color: #ffffff;
+  border: none!important;
+  box-shadow: 0px 5px 60px #fafafa7c;
 }

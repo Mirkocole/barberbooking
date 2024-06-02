@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { Container, Navbar, NavDropdown, Nav } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContextProvider'
+import Logo from '../../assets/logo-white.png'
 
 export default function MyNav() {
 
@@ -15,19 +16,19 @@ export default function MyNav() {
 
     return (
         <>
-            <Container fluid className='sticky-top bg-success'>
+            <Container fluid className='sticky-top bg-warning'>
                 <Navbar expand="lg" className="nav-dark sticky-top" data-bs-theme="dark">
                     <Container>
-                        <Navbar.Brand>React-Bootstrap</Navbar.Brand>
+                        <Link to="/" className='me-4'><img alt='logo' src={Logo} style={{maxWidth: '100px'}}/></Link>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="me-auto">
                                 <Link to="/" className='nav-link text-white'>Home</Link>
+                                {!admin.barber && <Link to="/ricerca" className='nav-link text-white'>Ricerca</Link>}
                                 <Link to={admin.barber ? "/booking" : "/prenotazioni"} className='nav-link text-white'>Prenotazioni</Link>
                                 {admin.barber && <Link to="/calendar" className='nav-link text-white'>Calendar</Link>}
-                                <Link to="/profile" className='nav-link text-white'>Account</Link>
-                                <NavDropdown title="Impostazioni" id="basic-nav-dropdown" className='bg-success'>
-                                    <Link to="#action/3.1" className='nav-link text-white px-4'>Impostazioni</Link>
+                                <NavDropdown title="Account" id="basic-nav-dropdown" className='bg-warning'>
+                                    <Link to="/profile" className='nav-link text-white px-4'>Impostazioni</Link>
                                     <Link to="#action/3.2" className='nav-link text-white px-4'>
                                         Privacy Policy
                                     </Link>

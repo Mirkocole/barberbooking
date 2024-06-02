@@ -2,18 +2,19 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Button, Container, Table } from 'react-bootstrap'
 import MyNav from '../../components/MyNav/MyNav'
 import { AuthContext } from '../../context/AuthContextProvider'
+import MyFooter from '../../components/MyFooter/MyFooter';
 
 export default function Booking() {
 
     const { admin, getProfile } = useContext(AuthContext);
-    const [refresh,setRefresh] = useState(false);
+    const [refresh, setRefresh] = useState(false);
 
 
-    async function deleteBooking(el){
+    async function deleteBooking(el) {
         try {
-            
-            let res = await fetch(process.env.REACT_APP_URL_BOOKING+el._id,{
-                headers: {'Content-Type' : 'application/json', 'Authorization':'Bearer '+localStorage.getItem('token')},
+
+            let res = await fetch(process.env.REACT_APP_URL_BOOKING + el._id, {
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                 method: 'DELETE',
                 body: JSON.stringify(el)
             });
@@ -22,14 +23,14 @@ export default function Booking() {
                 let json = await res.json();
                 setRefresh(!refresh);
             } else {
-                
+
             }
         } catch (error) {
-            
+
         }
     }
 
-    
+
 
     useEffect(() => {
         getProfile();
@@ -37,7 +38,7 @@ export default function Booking() {
 
     return (
         <>
-            <Container fluid className="p-0">
+            <Container fluid className="p-0 py-5" style={{ minHeight: '90vh' }}>
 
                 <MyNav />
 
@@ -48,12 +49,12 @@ export default function Booking() {
                 <Container className='mt-5'>
                     {admin.bookings.length <= 0 && <h5>Non ci sono appuntamenti prenotati</h5>}
 
-                    
+
 
                     {admin.bookings.length > 0 ? <Table striped bordered hover size="sm">
                         <thead>
                             <tr>
-                                
+
                                 <th>Data</th>
                                 <th>Orario</th>
                                 <th>Servizio richiesto</th>
@@ -62,24 +63,25 @@ export default function Booking() {
                             </tr>
                         </thead>
                         <tbody>
-                            {admin.bookings.sort(function(a, b){return new Date(b.start) - new Date(a.start)}).map((el,index) => {
+                            {admin.bookings.sort(function (a, b) { return new Date(b.start) - new Date(a.start) }).map((el, index) => {
                                 return <tr key={index}>
                                     <td>{new Date(el.start).toLocaleDateString()}</td>
-                                    <td>{new Date(el.start).getHours()}:{new Date(el.start).getMinutes().toLocaleString() == 0 ? '00' : new Date(el.start).getMinutes()} - 
-                                    {new Date(el.end).getHours()}:{new Date(el.end).getMinutes().toLocaleString() == 0 ? '00' : new Date(el.end).getMinutes()}</td>
+                                    <td>{new Date(el.start).getHours()}:{new Date(el.start).getMinutes().toLocaleString() === 0 ? '00' : new Date(el.start).getMinutes()} -
+                                        {new Date(el.end).getHours()}:{new Date(el.end).getMinutes().toLocaleString() === 0 ? '00' : new Date(el.end).getMinutes()}</td>
                                     <td>{el.barber?.salon} </td>
                                     <td>{el.barber?.salon} </td>
-                                    <td><span className='info link' onClick={()=> deleteBooking(el)}>Elimina</span> </td>
+                                    <td><span className='success link' onClick={() => deleteBooking(el)}>Elimina</span> </td>
                                 </tr>
                             })}
 
                         </tbody>
                     </Table> : ''}
 
-                    
+
                 </Container>
 
             </Container>
+            <MyFooter />
         </>
     )
 }

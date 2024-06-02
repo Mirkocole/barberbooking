@@ -10,6 +10,7 @@ import Profile from './views/Profile/Profile';
 import ProtectedAuthBarberRoute from './components/ProtectedAuthBarberRoute/ProtectedAuthBarberRoute';
 import Calendar from './views/Calendar/Calendar';
 import Booking from './views/Booking/Booking';
+import Search from './views/Search/Search';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
 
               <Route path='/' element={<Homepage />} />
               <Route path='/profile' element={<Profile />} />
+              <Route path='/ricerca' element={<Search />} />
               <Route path='/prenotazioni' element={<Booking />} />
               <Route path='/calendar/:id' element={<Calendar />} />
             </Route>

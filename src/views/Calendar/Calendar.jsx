@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { QronoCalendar } from 'booking_calendar'
 import MyNav from '../../components/MyNav/MyNav';
-import { Container, Modal, Form, Button, Spinner,Col } from 'react-bootstrap';
+import { Container, Modal, Form, Button, Spinner, Col, InputGroup } from 'react-bootstrap';
 import { useState } from 'react';
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
@@ -29,6 +29,11 @@ export default function MyCalendar() {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
+    // variabili modale barber
+    const [modalBarber, setModalBarber] = useState(false);
+    const hideModalBarber = () => setModalBarber(false);
+    const showModalBarber = () => setModalBarber(true);
+
     const { admin } = useContext(AuthContext);
 
     const [barber, setBarber] = useState({});
@@ -41,32 +46,33 @@ export default function MyCalendar() {
     const handleForm = (el) => {
         let idService = el.options[el.selectedIndex].value;
         let servi = barber.services.filter((se) => se._id == idService);
-        
+
         let end = new Date(new Date(newBooking.start).getTime() + servi[0].duration * 60000);
         console.log(end)
         setNewBooking((prev) => {
-            prev = { ...prev, services: [{ ...servi[0] }],end : end }
+            prev = { ...prev, services: [{ ...servi[0] }], end: end }
             return prev
         })
         console.log(newBooking)
     }
 
     const handleSelect = (e) => {
+
         
         if (admin.barber) {
-            alert('Sei il Parruchiere');
+            showModalBarber();
         } else {
-            
+
             if (e.start < new Date()) {
                 alert('Devi selezionare un orario presente o futuro!')
             } else {
-    
+
                 setNewBooking((prev) => {
                     prev = { ...prev, start: e.start }
                     return prev
                 })
                 showModalClient();
-    
+
             }
         }
 
@@ -75,11 +81,8 @@ export default function MyCalendar() {
     async function createBooking() {
         try {
 
-            
+
             setLoading(true);
-            
-
-
 
             let res = await fetch(process.env.REACT_APP_URL_BOOKING, {
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
@@ -144,7 +147,7 @@ export default function MyCalendar() {
             }
             setBookings([...listBookings]);
             console.log(bookings)
-            
+
         }
 
     }, [])
@@ -164,9 +167,9 @@ export default function MyCalendar() {
             }
             setBookings([...listBookings]);
             console.log(bookings)
-            
+
         }
-    }, [bookings])
+    }, [newBooking])
 
 
 
@@ -183,13 +186,13 @@ export default function MyCalendar() {
                     prev = { ...prev, barber: json._id }
                     return prev
                 });
-                
+
                 let listBookings = [];
                 for (const boo of json.bookings) {
                     listBookings.push({ start: new Date(boo.start), end: new Date(boo.end), title: `${boo.client.name} ${boo.client.lastname}` })
                 }
                 setBookings([...listBookings]);
-                
+
 
             } else {
                 console.log('errore di ricezione dati')
@@ -210,11 +213,11 @@ export default function MyCalendar() {
 
                 <Container className='row m-3 p-0 d-flex flex-row align-items-center p-2 shadow rounded'>
                     <Col xs={12} md={2}>
-                    <img alt='' src={barber.avatar} style={{width: '100px', height: '100px', objectFit:'cover'}} className='rounded-circle d-inline-block '/>
+                        <img alt='' src={barber.avatar} style={{ width: '100px', height: '100px', objectFit: 'cover' }} className='rounded-circle d-inline-block ' />
                     </Col>
                     <Col>
-                    <h3 className='info'>{barber.salon}</h3>
-                    <p className='info'>{barber.name} {barber.lastname}</p>
+                        <h3 className='success'>{barber.salon}</h3>
+                        <p className='warning'>{barber.name} {barber.lastname}</p>
                     </Col>
                 </Container>
                 <Container className='mb-3'>
@@ -277,6 +280,39 @@ export default function MyCalendar() {
                     {errorMessage !== '' && <p className='info'>{errorMessage}</p>}
                 </Modal.Footer>
             </Modal>
+
+
+            {/* Modale Disponibilità Barber */}
+            <Modal show={modalBarber} onHide={hideModalBarber}>
+                <Modal.Header>
+                    <h4>Gestione Disponibilità</h4>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        
+                        <InputGroup className="mb-3 w-auto">
+                            <InputGroup.Text>Dalle ore</InputGroup.Text>
+                            <Form.Control type='time' id='start'/>
+                            <InputGroup.Text>Alle ore</InputGroup.Text>
+                            <Form.Control type='time' id='end'/>
+                        </InputGroup>
+                        <Form.Group>
+                            <Form.Label>Titolo</Form.Label>
+                            <Form.Control type='text' placeholder='Es. Non disponibile, Ferie,...' />
+                        </Form.Group>
+                        <Form.Group className='d-flex my-2'>
+
+                            <Button onClick={hideModalBarber} className='me-2 bg-danger'>Annulla</Button>
+                            <Button onClick={createBooking} className='bg-success'>Aggiorna</Button>
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    {loading && <Spinner animation="grow" variant="danger" />}
+                    {errorMessage !== '' && <p className='info'>{errorMessage}</p>}
+                </Modal.Footer>
+            </Modal>
+
         </>
     )
 }

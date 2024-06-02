@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Col, Container, Row, Modal, Button, Form, Spinner } from 'react-bootstrap'
 import MyNav from '../../components/MyNav/MyNav'
 import { AuthContext } from '../../context/AuthContextProvider'
+import MyFooter from '../../components/MyFooter/MyFooter';
 
 export default function Profile() {
 
@@ -19,10 +20,11 @@ export default function Profile() {
         setModalService((prev) => !prev);
     }
 
-    const [modalEditService,setModalEditService] = useState(false);
-    const handleModalEditService = (el)=> {
+    const [modalEditService, setModalEditService] = useState(false);
+    const handleModalEditService = (el) => {
         setService(el);
-        setModalEditService(!modalEditService)};
+        setModalEditService(!modalEditService)
+    };
 
     const handleService = (el) => {
         let key = el.id;
@@ -132,7 +134,7 @@ export default function Profile() {
         }
     }
 
-    async function updateService(id){
+    async function updateService(id) {
         try {
             setLoading(true);
             console.log(process.env.REACT_APP_URL_BARBER + editProfile._id + '/services/' + id)
@@ -176,16 +178,16 @@ export default function Profile() {
                 });
                 if (res.ok) {
                     console.log('immagine caricata');
-                    
+
                     let response = await res.json();
                     console.log(response);
                     if (response) {
                         let res2 = await fetch(API + response._id, {
                             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Content-Type': 'application/json' },
                             method: 'PUT',
-                            body: JSON.stringify({...editProfile,avatar: response.avatar})
+                            body: JSON.stringify({ ...editProfile, avatar: response.avatar })
                         });
-    
+
                         if (res2.ok) {
                             setLoading(false);
                             let json = await res2.json();
@@ -197,7 +199,7 @@ export default function Profile() {
                             setShowEditBar(false);
                             setRefresh(true);
                         }
-                    }else{
+                    } else {
                         console.log('response non è ok')
                     }
                     imageAvatar.delete('avatar');
@@ -249,32 +251,33 @@ export default function Profile() {
             <Container fluid className="p-0 ">
                 <MyNav />
 
-                <Container className=' p-5 border rounded'>
-                    <Row xs={1} md={2} className='g-2 justify-content-center'>
-                        {admin.barber && <Col xs={12} md={4}>
-                            <Container className='p-4 border'>
-                                <h3 >Salone: <br></br> <b className='info'>{admin.salon}</b></h3>
-                                <img alt='immagine profilo' src={admin.cover ?? ''} style={{ width: '180px', height: '180px' }} />
-                            </Container>
-                        </Col>}
-                        <Col>
-                            <Container className='p-4 border rounded'>
-                                <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit: 'cover' }} className='rounded-circle' />
-                                {admin.barber && <span className='warning d-block'>*Account Professional</span>}
-                                <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
-                                <span className='px-2'>{admin.email}</span>
-                                <hr></hr>
-                                {admin.address?.street && <h4 className='px-2'>Indirizzo</h4>}
-                                <span className='px-2'>{admin.address?.street}</span>
-                                <span className='px-2'>{admin.address?.city}</span>
-                                <span className='px-2'>{admin.address?.postalCode}</span>
-                                <span className='px-2'>{admin.address?.country}</span>
-                                <Row>
+                <Container fluid className='herobarber' style={{ backgroundImage: `url(${admin.avatar})` }}>
 
-                                    <span className='nav-link btn-outline-light success px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>modifica profilo</span>
-                                    <span className='nav-link btn-outline-light info px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>elimina profilo</span>
-                                </Row>
-                            </Container>
+                </Container>
+
+                <Container className=' p-5'>
+                    <Row className='g-2 justify-content-center'>
+                        
+                                <Col>
+                                    <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit: 'cover' }} className='rounded-circle' />
+                                </Col>
+                                <Col xs={12} md={9} className=''>
+                                    {admin.barber && <span className='warning d-block'>*Account Professional</span>}
+                                    <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
+                                    <span className='px-2'>{admin.email}</span>
+                                    <hr className='w-75'></hr>
+                                    {admin.address?.street && <h4 className='px-2'>Indirizzo</h4>}
+                                    <span className='px-2'>{admin.address?.street}</span>
+                                    <span className='px-2'>{admin.address?.city}</span>
+                                    <span className='px-2'>{admin.address?.postalCode}</span>
+                                    <span className='px-2'>{admin.address?.country}</span>
+                                    <Row className='p-1'>
+
+                                        <span className='nav-link btn-outline-light success px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Modifica profilo</span>
+                                        <span className='nav-link btn-outline-light warning px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Elimina profilo</span>
+                                    </Row>
+                                </Col>
+                            
 
                             {admin.barber && <Container className='my-3'>
                                 <Button className='bg-primary' onClick={handleModalService}>Aggiungi Servizio +</Button>
@@ -287,15 +290,15 @@ export default function Profile() {
                                     <span>Durata: <b>{el.duration} min</b></span><br></br>
                                     <span><b>{el.price}€</b></span><br></br>
                                     <span className='link info me-3' onClick={() => deleteService(el._id)}>Elimina</span>
-                                    <span className='link primary' onClick={()=> handleModalEditService(el)}>Modifica</span>
+                                    <span className='link primary' onClick={() => handleModalEditService(el)}>Modifica</span>
                                 </Container>
                             })}
-                        </Col>
+                        
                     </Row>
                 </Container>
             </Container>
 
-
+            <MyFooter />
 
 
 
@@ -356,7 +359,7 @@ export default function Profile() {
                     <Button variant="secondary" onClick={handleModalEditService}>
                         Annulla
                     </Button>
-                    <Button variant="primary" onClick={()=>updateService(service._id)}>
+                    <Button variant="primary" onClick={() => updateService(service._id)}>
                         Modifica
                     </Button>
                     {loading && <Container className='row'>

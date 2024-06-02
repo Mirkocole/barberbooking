@@ -9,7 +9,7 @@ export default function Register() {
 
 
     const navigate = useNavigate();
-    const {admin,setAdmin} = useContext(AuthContext);
+    const { admin, setAdmin } = useContext(AuthContext);
     const [validated, setValidated] = useState(false);
     const [validatedbar, setValidatedbar] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -62,7 +62,7 @@ export default function Register() {
             if (res.ok) {
                 setLoading(false);
                 let json = await res.json();
-                login({email: cliente.email, password: cliente.password});
+                login({ email: cliente.email, password: cliente.password });
 
             } else {
                 setLoading(false);
@@ -92,7 +92,7 @@ export default function Register() {
                 setLoading(false);
                 let json = await res.json();
                 console.log(json);
-                login({email: barber.email, password: barber.password});
+                login({ email: barber.email, password: barber.password });
 
             } else {
                 setLoading(false);
@@ -106,14 +106,14 @@ export default function Register() {
         }
     }
 
-    async function login(user){
+    async function login(user) {
         try {
             setLoading(true);
             console.log(user)
-            let res = await fetch(process.env.REACT_APP_URL_AUTH+'login',{
-                headers : {'Content-Type' : 'application/json'},
+            let res = await fetch(process.env.REACT_APP_URL_AUTH + 'login', {
+                headers: { 'Content-Type': 'application/json' },
                 method: 'POST',
-                body : JSON.stringify(user)
+                body: JSON.stringify(user)
             });
             if (res.ok) {
                 setLoading(false);
@@ -121,9 +121,9 @@ export default function Register() {
                 console.log(json);
 
                 setAdmin(json.user);
-                localStorage.setItem('token',json.token);
+                localStorage.setItem('token', json.token);
                 navigate('/');
-            }else{
+            } else {
                 setLoading(false);
             }
 
@@ -156,33 +156,36 @@ export default function Register() {
         }
 
         setValidatedbar(true);
-        
+
         createBarber();
     };
 
 
-    useEffect(()=>{
+    useEffect(() => {
         if (admin._id) {
             navigate('/');
         }
-    },[admin])
+    }, [admin])
 
     return (
         <>
 
             {/* Contenuto Pagina */}
-            <Container className='p-5 justify-content-center'>
+            <Container fluid className='p-5 justify-content-center heroRegister'>
                 <Row xs={1} md={2} className='g-3'>
                     <Col className='d-flex flex-column align-items-center'>
                         <Card style={{ width: '18rem' }}>
                             <Card.Img variant="top" src={Clireg} />
                             <Card.Body>
-                                <Card.Title>Registrazione Cliente</Card.Title>
+                                <h4>Registrazione Cliente</h4>
                                 <Card.Text>
-                                    Some quick example text to build on the card title and make up the
-                                    bulk of the card's content.
+                                    Crea il tuo account cliente per iniziare a prenotare i migliori servizi di bellezza.
                                 </Card.Text>
-                                <Button variant="success" onClick={handleShowCli}>Registrati</Button>
+                                <Row>
+
+                                    <p>Hai già un account? <span className='nav-link link success' onClick={() => navigate('/login')}>Accedi</span></p>
+                                    <Button className="bg-success" onClick={handleShowCli}>Registrati</Button>
+                                </Row>
                             </Card.Body>
                         </Card>
                     </Col>
@@ -190,12 +193,16 @@ export default function Register() {
                         <Card style={{ width: '18rem' }}>
                             <Card.Img variant="top" src={Barbereg} />
                             <Card.Body>
-                                <Card.Title>Registrazione Parrucchiere</Card.Title>
+                                <h4>Registrazione Parrucchiere</h4>
                                 <Card.Text>
-                                    Some quick example text to build on the card title and make up the
-                                    bulk of the card's content.
+                                    Iscriviti per gestire facilmente le tue prenotazioni e far crescere il tuo business.
                                 </Card.Text>
-                                <Button variant="dark" onClick={handleShowBar}>Registrati</Button>
+                                <Row>
+
+                                    <p>Hai già un account? <span className='nav-link link success' onClick={() => navigate('/login')}>Accedi</span></p>
+                                    
+                                    <Button className="bg-primary" onClick={handleShowBar}>Registrati</Button>
+                                </Row>
                             </Card.Body>
                         </Card>
                     </Col>
