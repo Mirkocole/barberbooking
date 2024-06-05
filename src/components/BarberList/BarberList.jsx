@@ -105,7 +105,7 @@ export default function BarberList() {
         <>
 
 
-            <Container className='my-5'>
+            <Container className='py-5'>
                 <h3 className='primary'>Lista Parrucchieri</h3>
 
                 <Form className='my-3' onSubmit={(e) => e.preventDefault()}>

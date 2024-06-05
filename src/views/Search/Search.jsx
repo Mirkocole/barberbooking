@@ -7,7 +7,7 @@ import MyFooter from '../../components/MyFooter/MyFooter'
 
 export default function Search() {
     return (
-        <>
+        <div className='responsive'>
             <Container fluid className='m-0 p-0' style={{ minHeight: '90vh' }}>
 
                 <MyNav />
@@ -17,7 +17,10 @@ export default function Search() {
 
 
             </Container>
-            <MyFooter />
-        </>
+            <Container fluid className='d-none d-lg-flex p-0'>
+
+                <MyFooter />
+            </Container>
+        </div>
     )
 }

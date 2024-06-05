@@ -247,7 +247,7 @@ export default function Profile() {
     }, [refresh])
 
     return (
-        <>
+        <div className='responsive'>
             <Container fluid className="p-0 ">
                 <MyNav />
 
@@ -257,48 +257,51 @@ export default function Profile() {
 
                 <Container className=' p-5'>
                     <Row className='g-2 justify-content-center'>
-                        
-                                <Col>
-                                    <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit: 'cover' }} className='rounded-circle' />
-                                </Col>
-                                <Col xs={12} md={9} className=''>
-                                    {admin.barber && <span className='warning d-block'>*Account Professional</span>}
-                                    <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
-                                    <span className='px-2'>{admin.email}</span>
-                                    <hr className='w-75'></hr>
-                                    {admin.address?.street && <h4 className='px-2'>Indirizzo</h4>}
-                                    <span className='px-2'>{admin.address?.street}</span>
-                                    <span className='px-2'>{admin.address?.city}</span>
-                                    <span className='px-2'>{admin.address?.postalCode}</span>
-                                    <span className='px-2'>{admin.address?.country}</span>
-                                    <Row className='p-1'>
 
-                                        <span className='nav-link btn-outline-light success px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Modifica profilo</span>
-                                        <span className='nav-link btn-outline-light warning px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Elimina profilo</span>
-                                    </Row>
-                                </Col>
-                            
+                        <Col>
+                            <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit: 'cover' }} className='rounded-circle' />
+                        </Col>
+                        <Col xs={12} md={9} className=''>
+                            {admin.barber && <span className='warning d-block'>*Account Professional</span>}
+                            <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
+                            <span className='px-2'>{admin.email}</span>
+                            <hr className='w-75'></hr>
+                            {admin.address?.street && <h4 className='px-2'>Indirizzo</h4>}
+                            <span className='px-2'>{admin.address?.street}</span>
+                            <span className='px-2'>{admin.address?.city}</span>
+                            <span className='px-2'>{admin.address?.postalCode}</span>
+                            <span className='px-2'>{admin.address?.country}</span>
+                            <Row className='p-1'>
 
-                            {admin.barber && <Container className='my-3'>
-                                <Button className='bg-primary' onClick={handleModalService}>Aggiungi Servizio +</Button>
-                            </Container>}
+                                <span className='nav-link btn-outline-light success px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Modifica profilo</span>
+                                <span className='nav-link btn-outline-light warning px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Elimina profilo</span>
+                            </Row>
+                        </Col>
 
-                            {admin.barber && admin.services.map((el) => {
-                                return <Container key={el.name} className='p-4 border rounded my-1'>
-                                    <h3>{el.name}</h3>
-                                    <span>{el.description}</span><br></br>
-                                    <span>Durata: <b>{el.duration} min</b></span><br></br>
-                                    <span><b>{el.price}€</b></span><br></br>
-                                    <span className='link info me-3' onClick={() => deleteService(el._id)}>Elimina</span>
-                                    <span className='link primary' onClick={() => handleModalEditService(el)}>Modifica</span>
-                                </Container>
-                            })}
-                        
+
+                        {admin.barber && <Container className='my-3'>
+                            <Button className='bg-primary' onClick={handleModalService}>Aggiungi Servizio +</Button>
+                        </Container>}
+
+                        {admin.barber && admin.services.map((el) => {
+                            return <Container key={el.name} className='p-4 border rounded my-1'>
+                                <h3>{el.name}</h3>
+                                <span>{el.description}</span><br></br>
+                                <span>Durata: <b>{el.duration} min</b></span><br></br>
+                                <span><b>{el.price}€</b></span><br></br>
+                                <span className='link info me-3' onClick={() => deleteService(el._id)}>Elimina</span>
+                                <span className='link primary' onClick={() => handleModalEditService(el)}>Modifica</span>
+                            </Container>
+                        })}
+
                     </Row>
                 </Container>
             </Container>
 
-            <MyFooter />
+            <Container fluid className='d-none d-lg-flex p-0'>
+
+                <MyFooter />
+            </Container>
 
 
 
@@ -423,6 +426,6 @@ export default function Profile() {
                     </div>
                 </Modal.Body>
             </Modal> */}
-        </>
+        </div>
     )
 }

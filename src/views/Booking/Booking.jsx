@@ -13,6 +13,7 @@ export default function Booking() {
     async function deleteBooking(el) {
         try {
 
+            
             let res = await fetch(process.env.REACT_APP_URL_BOOKING + el._id, {
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                 method: 'DELETE',
@@ -37,8 +38,8 @@ export default function Booking() {
     }, [refresh])
 
     return (
-        <>
-            <Container fluid className="p-0 py-5" style={{ minHeight: '90vh' }}>
+        <div className='responsive'>
+            <Container fluid className="p-0 py-0" style={{ minHeight: '90vh' }}>
 
                 <MyNav />
 
@@ -68,7 +69,7 @@ export default function Booking() {
                                     <td>{new Date(el.start).toLocaleDateString()}</td>
                                     <td>{new Date(el.start).getHours()}:{new Date(el.start).getMinutes().toLocaleString() === 0 ? '00' : new Date(el.start).getMinutes()} -
                                         {new Date(el.end).getHours()}:{new Date(el.end).getMinutes().toLocaleString() === 0 ? '00' : new Date(el.end).getMinutes()}</td>
-                                    <td>{el.barber?.salon} </td>
+                                    <td>{el.services[0]?.name ?? el.title + ' (Barber)'} </td>
                                     <td>{el.barber?.salon} </td>
                                     <td><span className='success link' onClick={() => deleteBooking(el)}>Elimina</span> </td>
                                 </tr>
@@ -81,7 +82,10 @@ export default function Booking() {
                 </Container>
 
             </Container>
-            <MyFooter />
-        </>
+            <Container fluid className='d-none d-lg-flex p-0'>
+
+                <MyFooter />
+            </Container>
+        </div>
     )
 }
