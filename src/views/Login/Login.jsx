@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, Container, Form, Spinner, Row, Col } from 'react-bootstrap'
 import { AuthContext } from '../../context/AuthContextProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Logo from '../../assets/logo.png';
+import { useLocation } from 'react-router-dom'
+import GoogleButton from 'react-google-button'
 
 export default function Login() {
 
@@ -10,6 +12,8 @@ export default function Login() {
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const {search} = useLocation()
+    const params = new URLSearchParams(search);
     const { admin, setAdmin } = useContext(AuthContext);
 
     const [user, setUser] = useState({
@@ -19,6 +23,32 @@ export default function Login() {
 
 
     const [logged, setLogged] = useState(false);
+
+    async function getAdmin  (token) {
+        try {
+            let res = await fetch(process.env.REACT_APP_URL_AUTH+'me',{
+                headers:{'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token}
+            });
+  
+            if(res){
+                let json = await res.json();
+                setAdmin((prev) =>{
+                    return prev = json;
+                });
+                return json;
+            }
+        } catch (error) {
+            
+        }
+    }
+
+    useEffect(()=>{
+        if (params.has('accessToken')) {
+            getAdmin(params.get('accessToken'));
+            localStorage.setItem('token',params.get('accessToken'));
+            
+        }
+    },[])
 
     // Refresh pagina
     useEffect(() => {
@@ -60,6 +90,10 @@ export default function Login() {
         }
     }
 
+    const handleGoogleLogin = () => {
+        window.open(process.env.REACT_APP_URL_AUTH + 'googleLogin', '_self');
+    }
+
 
     return (
         <>
@@ -89,6 +123,8 @@ export default function Login() {
                         <Form.Group className='my-3 d-flex flex-row align-items-center'>
                             <span className='m-2 info nav-link link' onClick={() => { navigate('/register') }}>Registrati</span>
                             <Button className='m-2 bg-success' onClick={login}>Login</Button>
+                            <GoogleButton label='Accedi con Google' onClick={handleGoogleLogin} />
+                            {loading && <Spinner animation="border" variant="secondary" />}
                         </Form.Group>
                         {loading && <Spinner animation='grow' variant='success' />}
                     </Form>
