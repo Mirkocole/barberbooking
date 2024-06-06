@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
-import { QronoCalendar } from 'booking_calendar'
 import MyNav from '../../components/MyNav/MyNav';
 import { Container, Modal, Form, Button, Spinner, Col, InputGroup, Row } from 'react-bootstrap';
 import { useState } from 'react';
