@@ -3,10 +3,27 @@ import { Col, Container, Row, Modal, Button, Form, Spinner } from 'react-bootstr
 import MyNav from '../../components/MyNav/MyNav'
 import { AuthContext } from '../../context/AuthContextProvider'
 import MyFooter from '../../components/MyFooter/MyFooter';
+import { CiLogout } from "react-icons/ci";
+import { useNavigate } from 'react-router-dom';
+import { FaStar } from "react-icons/fa";
+
 
 export default function Profile() {
 
-    const { admin, getProfile } = useContext(AuthContext);
+    const { admin, getProfile, setAdmin } = useContext(AuthContext);
+
+    let star = [];
+    for (let index = 0; index < admin.valutation; index++) {
+        star.push(index);
+
+    }
+
+    const navigate = useNavigate();
+    function logOut() {
+        localStorage.removeItem('token');
+        setAdmin({});
+        navigate('/login');
+    }
 
     const [refresh, setRefresh] = useState(false);
 
@@ -255,45 +272,58 @@ export default function Profile() {
 
                 </Container>
 
-                <Container className=' p-5'>
+                <Container className='mb-5 p-5'>
                     <Row className='g-2 justify-content-center'>
 
-                        <Col>
+                        <Col xs={12} >
                             <img alt='immagine profilo' src={admin.avatar ?? ''} style={{ width: '180px', height: '180px', objectFit: 'cover' }} className='rounded-circle' />
                         </Col>
-                        <Col xs={12} md={9} className=''>
+                        <Col xs={12} className=''>
                             {admin.barber && <span className='warning d-block'>*Account Professional</span>}
                             <h3 className='px-2'>{admin.name} {admin.lastname}</h3>
                             <span className='px-2'>{admin.email}</span>
+                            <p className='d-flex flex-row ps-2'>
+
+                                {admin.barber && star.length > 0 && star.map((el, index) => {
+                                    return <span key={index} className='px-1 w-auto' style={{color: 'gold'}}><FaStar /></span>
+
+                                })}
+                                {admin.barber && <span className='px-2 success'> ({admin.feedback.length}) Recension{admin.feedback.length > 1 ? 'i' : 'e'}</span>}
+                            </p>
+
                             <hr className='w-75'></hr>
                             {admin.address?.street && <h4 className='px-2'>Indirizzo</h4>}
                             <span className='px-2'>{admin.address?.street}</span>
                             <span className='px-2'>{admin.address?.city}</span>
                             <span className='px-2'>{admin.address?.postalCode}</span>
                             <span className='px-2'>{admin.address?.country}</span>
-                            <Row className='p-1'>
+                            <Row className='p-1 align-items-baseline'>
 
                                 <span className='nav-link btn-outline-light success px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Modifica profilo</span>
                                 <span className='nav-link btn-outline-light warning px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Elimina profilo</span>
+                                <span className=' d-lg-none btn bg-primary text-white w-auto' onClick={logOut}>LogOut <CiLogout /></span>
                             </Row>
                         </Col>
 
 
-                        {admin.barber && <Container className='my-3'>
-                            <Button className='bg-primary' onClick={handleModalService}>Aggiungi Servizio +</Button>
+                        {admin.barber && <Container className='my-3 p-0'>
+                            <Button className='bg-success mt-3' onClick={handleModalService}>Aggiungi Servizio +</Button>
                         </Container>}
 
+                        <Row xs={1} md={3} xl={4}>
+
                         {admin.barber && admin.services.map((el) => {
-                            return <Container key={el.name} className='p-4 border rounded my-1'>
+                            return <Col key={el.name} className='p-4 border rounded my-1'>
                                 <h3>{el.name}</h3>
                                 <span>{el.description}</span><br></br>
                                 <span>Durata: <b>{el.duration} min</b></span><br></br>
                                 <span><b>{el.price}€</b></span><br></br>
-                                <span className='link info me-3' onClick={() => deleteService(el._id)}>Elimina</span>
+                                <span className='link success me-3' onClick={() => deleteService(el._id)}>Elimina</span>
                                 <span className='link primary' onClick={() => handleModalEditService(el)}>Modifica</span>
-                            </Container>
+                            </Col>
                         })}
 
+                        </Row>
                     </Row>
                 </Container>
             </Container>

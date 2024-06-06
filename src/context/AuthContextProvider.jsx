@@ -14,7 +14,23 @@ export default function AuthContextProvider({children}) {
         });
         if (res.ok) {
           let json = await res.json();
-          setAdmin(json);
+          
+          if (json.feedback) {
+            
+            let countFeed = 0;
+            json.feedback.forEach(el => {
+              // console.log(el.value)
+              countFeed += el.value;
+            });
+            let mediaFeed = countFeed / json.feedback.length;
+            // console.log(mediaFeed)
+            setAdmin({...json,valutation: mediaFeed});
+            // console.log(admin)
+          }else{
+
+            setAdmin(json);
+          }
+          
         }
       } catch (error) {
         
