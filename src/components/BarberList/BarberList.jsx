@@ -61,6 +61,10 @@ export default function BarberList() {
                     });
                 }
                 setBarberlist((prev)=>json);
+
+                if (!searchFilter.city && updateList.length <= 0) {
+                    setUpdateList((prev)=>json);
+                }
                 
             }
 
@@ -73,7 +77,8 @@ export default function BarberList() {
     useEffect(() => {
 
         getBarber().then(()=>{
-            setUpdateList((prev => barberlist));
+            console.log(barberlist)
+            setUpdateList(barberlist);
         });
 
         
