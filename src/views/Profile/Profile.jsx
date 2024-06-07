@@ -257,6 +257,21 @@ export default function Profile() {
 
     }
 
+    async function deleteAccount(){
+        try {
+            let res = await fetch(admin.barber ? process.env.REACT_APP_URL_BARBER : process.env.REACT_APP_URL_CLIENT + admin._id,{
+                headers: {'Content-Type': 'application/json', 'Authorization':'Bearer '+localStorage.getItem('token')},
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                alert('Utente Eliminato!');
+                logOut();
+            }
+        } catch (error) {
+            
+        }
+    }
 
 
     useEffect(() => {
@@ -300,8 +315,8 @@ export default function Profile() {
                             <Row className='p-1 align-items-baseline'>
 
                                 <span className='nav-link btn-outline-light success px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Modifica profilo</span>
-                                <span className='nav-link btn-outline-light warning px-2 mt-3 link w-auto' onClick={() => { setShowEditBar(true) }}>Elimina profilo</span>
-                                <span className=' d-lg-none btn bg-primary text-white w-auto' onClick={logOut}>LogOut <CiLogout /></span>
+                                <span className='nav-link btn-outline-light warning px-2 mt-3 link w-auto' onClick={ deleteAccount }>Elimina profilo</span>
+                                <span className='mt-3 d-lg-none btn bg-primary text-white w-auto' onClick={logOut}>LogOut <CiLogout /></span>
                             </Row>
                         </Col>
 

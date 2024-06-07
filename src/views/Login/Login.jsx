@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Button, Container, Form, Spinner, Row, Col } from 'react-bootstrap'
+import { Button, Container, Form, Spinner, Row, Col,Alert } from 'react-bootstrap'
 import { AuthContext } from '../../context/AuthContextProvider';
 import { useNavigate, useParams } from 'react-router-dom';
 import Logo from '../../assets/logo.png';
@@ -12,9 +12,10 @@ export default function Login() {
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const {search} = useLocation()
+    const { search } = useLocation()
     const params = new URLSearchParams(search);
     const { admin, setAdmin } = useContext(AuthContext);
+    const [message, setMessage] = useState('');
 
     const [user, setUser] = useState({
         email: '',
@@ -24,31 +25,31 @@ export default function Login() {
 
     const [logged, setLogged] = useState(false);
 
-    async function getAdmin  (token) {
+    async function getAdmin(token) {
         try {
-            let res = await fetch(process.env.REACT_APP_URL_AUTH+'me',{
-                headers:{'Content-Type' : 'application/json', 'Authorization' : 'Bearer '+token}
+            let res = await fetch(process.env.REACT_APP_URL_AUTH + 'me', {
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
             });
-  
-            if(res){
+
+            if (res) {
                 let json = await res.json();
-                setAdmin((prev) =>{
+                setAdmin((prev) => {
                     return prev = json;
                 });
                 return json;
             }
         } catch (error) {
-            
+
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         if (params.has('accessToken')) {
             getAdmin(params.get('accessToken'));
-            localStorage.setItem('token',params.get('accessToken'));
-            
+            localStorage.setItem('token', params.get('accessToken'));
+
         }
-    },[])
+    }, [])
 
     // Refresh pagina
     useEffect(() => {
@@ -82,6 +83,10 @@ export default function Login() {
                 navigate('/');
             } else {
                 setLoading(false);
+                setMessage('Errore nel Login');
+                setTimeout(()=>{
+                    setMessage('');
+                },2000)
             }
 
         } catch (error) {
@@ -106,7 +111,7 @@ export default function Login() {
                         <Row className='no-wrap'>
 
                             <h3>Login</h3>
-                            <img alt='logo' src={Logo} style={{maxWidth : '100px'}}/>
+                            <img alt='logo' src={Logo} style={{ maxWidth: '100px' }} />
                         </Row>
                         <Form.Group>
                             <Form.Label>
@@ -125,8 +130,11 @@ export default function Login() {
                             <Button className='m-2 bg-success' onClick={login}>Login</Button>
                             {loading && <Spinner animation="border" variant="secondary" />}
                         </Form.Group>
-                            <GoogleButton label='Accedi con Google' onClick={handleGoogleLogin} />
+                        <GoogleButton label='Accedi con Google' onClick={handleGoogleLogin} />
                         {loading && <Spinner animation='grow' variant='success' />}
+                    {message !== '' && <Alert className='mt-2' variant={'danger'}>
+                        {message}
+                    </Alert>}
                     </Form>
                 </Col>
 
