@@ -298,7 +298,7 @@ export default function MyCalendar() {
 
             setLoading(true);
 
-            console.log(formBarber)
+            // console.log(formBarber)
 
             // if (modalBarber) {
             //     setNewBooking((prev)=>formBarber);

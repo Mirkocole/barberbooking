@@ -7,7 +7,6 @@ export default function BarberList() {
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const [barberlist, setBarberlist] = useState([]);
-    const [modalBook, setModalBook] = useState(false);
     const [filter, setFilter] = useState('');
     const [searchFilter, setSearchFilter] = useState({});
     let [updateList,setUpdateList]= useState([]);
@@ -25,13 +24,11 @@ export default function BarberList() {
 
     }
 
-    let minDate = new Date().toISOString().split('T')[0];
 
     const [city, setCity] = useState([]);
     const [country, setCountry] = useState([]);
 
-    const hideModal = () => setModalBook(false);
-    const showModal = () => setModalBook(true);
+
 
     const handleFilter = (el) => {
         setFilter(el.value);
@@ -76,10 +73,7 @@ export default function BarberList() {
 
     useEffect(() => {
 
-        getBarber().then(()=>{
-            console.log(barberlist)
-            setUpdateList(barberlist);
-        });
+        getBarber();
 
         
 
@@ -89,12 +83,9 @@ export default function BarberList() {
 
         
         getBarber().then(()=>{
-            console.log(barberlist);
-            if (searchFilter.city || searchFilter.country) {
-                console.log(searchFilter);
+            
+            if (searchFilter.city) {
                 let keys = Object.keys(searchFilter);
-                let updateList = barberlist.filter((el) => el.address[keys[0]] === searchFilter[keys[0]]);
-                // console.log(updateList);
     
                 setUpdateList((prev) => {
                     prev = barberlist.filter((el) => searchFilter[keys[0]] !== 'Città' ? el.address[keys[0]] === searchFilter[keys[0]] : true);
@@ -162,19 +153,6 @@ export default function BarberList() {
 
 
 
-            {/* Modal Booking */}
-            <Modal show={modalBook} onHide={hideModal}>
-                <Modal.Header>
-                    <h3>Prenotati!</h3>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group>
-                            <Form.Control type='date' min={minDate} />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-            </Modal>
         </>
     )
 }
