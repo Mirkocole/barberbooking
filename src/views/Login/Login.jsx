@@ -121,11 +121,11 @@ export default function Login() {
                             <Form.Control type='password' placeholder={'insert your password'} id='password' onChange={(el) => handleForm(el.target)} />
                         </Form.Group>
                         <Form.Group className='my-3 d-flex flex-row align-items-center'>
-                            <span className='m-2 info nav-link link' onClick={() => { navigate('/register') }}>Registrati</span>
+                            <span className='m-2 warning nav-link link' onClick={() => { navigate('/register') }}>Registrati</span>
                             <Button className='m-2 bg-success' onClick={login}>Login</Button>
-                            <GoogleButton label='Accedi con Google' onClick={handleGoogleLogin} />
                             {loading && <Spinner animation="border" variant="secondary" />}
                         </Form.Group>
+                            <GoogleButton label='Accedi con Google' onClick={handleGoogleLogin} />
                         {loading && <Spinner animation='grow' variant='success' />}
                     </Form>
                 </Col>
