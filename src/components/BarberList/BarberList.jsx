@@ -10,6 +10,7 @@ export default function BarberList() {
     const [modalBook, setModalBook] = useState(false);
     const [filter, setFilter] = useState('');
     const [searchFilter, setSearchFilter] = useState({});
+    let [updateList,setUpdateList]= useState([]);
 
     const handleSearchFilter = (el) => {
         let value = el.options[el.selectedIndex].value;
@@ -59,7 +60,8 @@ export default function BarberList() {
                         return [...new Set(prev)];
                     });
                 }
-                setBarberlist(json);
+                setBarberlist((prev)=>json);
+                
             }
 
         } catch (error) {
@@ -70,34 +72,32 @@ export default function BarberList() {
 
     useEffect(() => {
 
-        getBarber();
+        getBarber().then(()=>{
+            setUpdateList((prev => barberlist));
+        });
+
+        
 
     }, []);
 
     useEffect(() => {
 
-        if (!searchFilter.city || searchFilter.city === 'Città') {
-            
-            let updateCity = [];
-            let barbers = barberlist.filter((el) => searchFilter.country !== 'Provincia' ? el.address.country == searchFilter.country : true);
-            for (const cit of barbers) {
-                updateCity.push(cit.address.city);
+        
+        getBarber().then(()=>{
+            console.log(barberlist);
+            if (searchFilter.city || searchFilter.country) {
+                console.log(searchFilter);
+                let keys = Object.keys(searchFilter);
+                let updateList = barberlist.filter((el) => el.address[keys[0]] === searchFilter[keys[0]]);
+                // console.log(updateList);
+    
+                setUpdateList((prev) => {
+                    prev = barberlist.filter((el) => searchFilter[keys[0]] !== 'Città' ? el.address[keys[0]] === searchFilter[keys[0]] : true);
+                    return prev;
+                });
             }
-            setCity((prev) => prev = updateCity);
-        }
+        });
 
-
-        
-            
-            let updateCountry = [];
-            let barbers2 = barberlist.filter((el) => searchFilter.city !== 'Città' ? el.address.city == searchFilter.city : true);
-            for (const cit of barbers2) {
-                updateCountry.push(cit.address.country);
-            }
-            setCountry((prev) => prev = updateCountry);
-
-        
-        
     }, [searchFilter])
 
 
@@ -127,16 +127,6 @@ export default function BarberList() {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col>
-                            <Form.Group>
-                                <Form.Select aria-label="Default select example" id='country' onChange={(el) => { handleSearchFilter(el.target) }}>
-                                    <option> Provincia</option>
-                                    {country.map((el, index) => {
-                                        return <option key={index} value={el}>{el}</option>
-                                    })}
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
                     </Row>
 
 
@@ -145,9 +135,10 @@ export default function BarberList() {
 
                 {/* Lista Parrucchieri */}
                 <Row xs={1} md={3} className='g-2'>
-                    {barberlist && barberlist.filter((el) => el.name.toLowerCase().includes(filter.toLowerCase()) ||
+                    {/* {console.log(barberlist)} */}
+                    {updateList && updateList.filter((el) => el.name.toLowerCase().includes(filter.toLowerCase()) ||
                         el.lastname.toLowerCase().includes(filter.toLowerCase()) ||
-                        el.email.toLowerCase().includes(filter.toLowerCase()) 
+                        el.email.toLowerCase().includes(filter.toLowerCase())
                     ).map((el, index) => {
                         return <Col key={index} className='cardBarber' onClick={() => navigate('/calendar/' + el._id)}>
                             <Container className='p-4 shadow rounded d-flex cardbarber'>
